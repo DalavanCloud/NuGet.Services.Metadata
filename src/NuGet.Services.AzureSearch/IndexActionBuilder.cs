@@ -165,6 +165,9 @@ namespace NuGet.Services.AzureSearch
             metadata.NormalizedVersion = package.NormalizedVersion;
             metadata.OriginalVersion = package.Version;
             metadata.PackageId = packageId;
+            metadata.PackageIdSimple = packageId;
+            metadata.PackageIdSimple = packageId;
+            metadata.PackageIdLowercase = packageId.ToLowerInvariant();
             metadata.Prerelease = package.IsPrerelease;
             metadata.ProjectUrl = package.ProjectUrl;
             metadata.Published = package.Listed ? AssumeUtc(package.Published) : UnlistedPublished;

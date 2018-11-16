@@ -108,6 +108,20 @@ namespace NuGet.Services.AzureSearch.Db2AzureSearch
                     Name = indexName,
                     Fields = FieldBuilder.BuildForType<T>(),
                     DefaultScoringProfile = "Default",
+                    Analyzers = new List<Analyzer>
+                    {
+                        new PatternAnalyzer(
+                            "CamelCaseAnalyzer",
+                            lowerCaseTerms: true,
+                            pattern: @"((?=[A-Z0-9])|[^A-Za-z0-9])"),
+                        new CustomAnalyzer(
+                            "LowercaseAnalyzer",
+                            TokenizerName.Keyword,
+                            tokenFilters: new List<TokenFilterName>
+                            {
+                                TokenFilterName.Lowercase,
+                            }),
+                    },
                     ScoringProfiles = new List<ScoringProfile>
                     {
                         new ScoringProfile("Default")
@@ -127,7 +141,15 @@ namespace NuGet.Services.AzureSearch.Db2AzureSearch
                             {
                                 Weights = new Dictionary<string, double>
                                 {
-                                    { "packageId", 10 },
+                                    { "packageIdSimple", 10 },
+                                    { "packageIdCamelCase", 10 },
+                                    { "packageIdLowercase", 10 },
+                                    { "title", 1 },
+                                    { "tags", 1 },
+                                    { "description", 1 },
+                                    { "owners", 1 },
+                                    { "summary", 1 },
+                                    { "authors", 1 },
                                 },
                             },
                         }
@@ -142,6 +164,20 @@ namespace NuGet.Services.AzureSearch.Db2AzureSearch
                 {
                     Name = indexName,
                     Fields = FieldBuilder.BuildForType<T>(),
+                    Analyzers = new List<Analyzer>
+                    {
+                        new PatternAnalyzer(
+                            "CamelCaseAnalyzer",
+                            lowerCaseTerms: true,
+                            pattern: @"((?=[A-Z0-9])|[^A-Za-z0-9])"),
+                        new CustomAnalyzer(
+                            "LowercaseAnalyzer",
+                            TokenizerName.Keyword,
+                            tokenFilters: new List<TokenFilterName>
+                            {
+                                TokenFilterName.Lowercase,
+                            }),
+                    },
                 });
             }
             _logger.LogInformation("Done creating index {IndexName}.", indexName);

@@ -34,9 +34,16 @@ namespace NuGet.Services.AzureSearch
         [IsSearchable]
         public string NormalizedVersion { get; set; }
         public string OriginalVersion { get; set; }
+        public string PackageId { get; set; }
         [IsSearchable]
         [Analyzer(AnalyzerName.AsString.Simple)]
-        public string PackageId { get; set; }
+        public string PackageIdSimple { get; set; }
+        [IsSearchable]
+        [Analyzer("CamelCaseAnalyzer")]
+        public string PackageIdCamelCase { get; set; }
+        [IsSearchable]
+        [Analyzer("LowercaseAnalyzer")]
+        public string PackageIdLowercase { get; set; }
         public bool? Prerelease { get; set; }
         public string ProjectUrl { get; set; }
         public string ReleaseNotes { get; set; }
