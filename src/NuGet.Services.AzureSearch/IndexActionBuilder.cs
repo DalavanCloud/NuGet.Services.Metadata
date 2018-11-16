@@ -99,6 +99,7 @@ namespace NuGet.Services.AzureSearch
             ApplyMetadata(metadata, packageRegistration.PackageId, package);
 
             metadata.Key = key;
+            metadata.SearchFilters = searchFilters.ToString();
             metadata.FullVersion = latest.FullVersion;
             metadata.TotalDownloadCount = packageRegistration.TotalDownloadCount;
             metadata.Owners = packageRegistration

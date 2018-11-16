@@ -58,7 +58,7 @@ namespace NuGet.Services.AzureSearch
 
             foreach (var action in indexActions.Hijack)
             {
-                EnqueueAndIncrement(_hijackActions, packageId, action);
+                // EnqueueAndIncrement(_hijackActions, packageId, action);
             }
 
             foreach (var action in indexActions.Search)
@@ -81,7 +81,7 @@ namespace NuGet.Services.AzureSearch
 
         private async Task PushBatchesAsync(bool onlyFull)
         {
-            await PushBatchesAsync(_hijackIndexClient, _hijackActions, onlyFull);
+            // await PushBatchesAsync(_hijackIndexClient, _hijackActions, onlyFull);
             await PushBatchesAsync(_searchIndexClient, _searchActions, onlyFull);
         }
 
@@ -125,6 +125,7 @@ namespace NuGet.Services.AzureSearch
 
                     foreach (var finished in allFinished)
                     {
+                        break;
                         _logger.LogDebug("Updating version list for package ID {PackageId}.", finished.Id);
                         await _versionListDataClient.ReplaceAsync(
                             finished.Id,

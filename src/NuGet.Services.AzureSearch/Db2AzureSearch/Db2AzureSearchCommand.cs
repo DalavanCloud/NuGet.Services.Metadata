@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -100,11 +101,49 @@ namespace NuGet.Services.AzureSearch.Db2AzureSearch
         private async Task CreateIndexAsync<T>(string indexName)
         {
             _logger.LogInformation("Creating index {IndexName}.", indexName);
-            await _serviceClient.Indexes.CreateAsync(new Index
+            if (indexName == _options.Value.SearchIndexName)
             {
-                Name = indexName,
-                Fields = FieldBuilder.BuildForType<T>(),
-            });
+                var index = new Index
+                {
+                    Name = indexName,
+                    Fields = FieldBuilder.BuildForType<T>(),
+                    DefaultScoringProfile = "Default",
+                    ScoringProfiles = new List<ScoringProfile>
+                    {
+                        new ScoringProfile("Default")
+                        {
+                            Functions = new List<ScoringFunction>
+                            {
+                                new MagnitudeScoringFunction(
+                                    fieldName: "totalDownloadCount",
+                                    boost: 100,
+                                    boostingRangeStart: 1000,
+                                    boostingRangeEnd: 1000000000,
+                                    shouldBoostBeyondRangeByConstant: true,
+                                    interpolation: ScoringFunctionInterpolation.Logarithmic),
+                            },
+                            FunctionAggregation = ScoringFunctionAggregation.Sum,
+                            TextWeights = new TextWeights
+                            {
+                                Weights = new Dictionary<string, double>
+                                {
+                                    { "packageId", 10 },
+                                },
+                            },
+                        }
+                    }
+                };
+                index.Validate();
+                await _serviceClient.Indexes.CreateAsync(index);
+            }
+            else
+            {
+                await _serviceClient.Indexes.CreateAsync(new Index
+                {
+                    Name = indexName,
+                    Fields = FieldBuilder.BuildForType<T>(),
+                });
+            }
             _logger.LogInformation("Done creating index {IndexName}.", indexName);
         }
 
